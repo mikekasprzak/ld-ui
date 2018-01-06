@@ -1,8 +1,25 @@
 import {h, Component}					from 'preact/preact';
-import Sanitize							from 'internal/sanitize/sanitize';
+//import Sanitize							from 'internal/sanitize/sanitize';
 
 // TODO: Push the state (arg1 of pushShate/replaceState (MK: what?)
 // MK TODO: give this file a serious look. tidy up
+
+// this is here to remove dependency on sanitizer
+function sanitizeURI( str ) {
+	// From marked/Renderer.js
+	try {
+		var Protocol = decodeURIComponent(unescape(str)).replace(/[^\w:]/g, '').toLowerCase();
+	}
+	catch (e) {
+		return '';
+	}
+
+	if ( Protocol.indexOf('javascript:') === 0 || Protocol.indexOf('vbscript:') === 0 || Protocol.indexOf('data:') === 0 ) {
+		return '';
+	}
+	return str;
+}
+
 
 export default class UILink extends Component {
 	constructor( props ) {
@@ -107,7 +124,7 @@ export default class UILink extends Component {
 		props = Object.assign({}, props);
 
 		if ( props.href ) {
-			props.href = Sanitize.sanitize_URI(props.href);
+			props.href = sanitizeURI(props.href);
 
 			if ( props.href.indexOf('//') !== -1 ) {
 				props.target = "_blank";
